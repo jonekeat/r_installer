@@ -1,8 +1,11 @@
+required_packages <- c("disk.frame", "tsibble")
+
 install_packages <- function(pkgs, 
                              repos = getOption("repos", "https://cran.rstudio.com/"),
                              ...) {
   # Get all loaded & attched pkgs in fresh session 
   loaded_pkg <- loadedNamespaces()
+  # attached_pkg <- .packages()
   
   # Warn if non-base pkgs are loaded before installation
   installed_pkg <- installed.packages()
@@ -31,15 +34,33 @@ install_packages <- function(pkgs,
   on.exit(options(opt))
   
   # Check if package exist
-  pkg_exist <- required_packages %in% installed_pkg[, "Package"]
+  pkg_exist <- pkgs %in% installed_pkg[, "Package"]
+  
+  # # Check if pkgs exist & can be loaded & attached properly
+  # pkg_exist <- unlist(lapply(pkgs, require, quietly = TRUE, 
+  #                            warn.conflicts = FALSE, character.only = TRUE))
+  # 
+  # # Detach & unload all checked pkgs before installation
+  # pkg_to_unload <- setdiff(loadedNamespaces(), loaded_pkg)
+  # init <- Sys.time()
+  # while(length(pkg_to_unload) > 0L) {
+  #   if (as.numeric(difftime(Sys.time(), init, units = "sec")) > timeout)
+  #     stop("timeout issue: unable to unload all loaded namespaces before package installation")
+  #   lapply(pkg_to_unload, FUN = function(pkg) try(unloadNamespace(pkg), silent = TRUE))
+  #   pkg_to_unload <- setdiff(loadedNamespaces(), loaded_pkg)
+  # }
+  # pkg_to_detach <- setdiff(.packages(), attached_pkg)
+  # if (length(pkg_to_detach))
+  #   lapply(pkg_to_detach, detach, name = paste0("package:", pkg_to_detach), 
+  #          character.only = TRUE, force = TRUE)
   
   # Only install missing pkgs
   if (any(pkg_exist))
-    message("'", paste0(required_packages[pkg_exist], collapse = "', '"),
+    message("'", paste0(pkgs[pkg_exist], collapse = "', '"),
             "' already installed and will be skipped. ", 
             "If you want to re-install these packages, ", 
             "try remove it first and re-run again\n")
-  pkg_to_install <- required_packages[!pkg_exist]
+  pkg_to_install <- pkgs[!pkg_exist]
   if (length(pkg_to_install))
     install.packages(pkg_to_install, repos = repos, ...)
   return(invisible(NULL))
