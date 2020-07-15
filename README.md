@@ -3,6 +3,14 @@
 
 *Note: This repo is currently not working solution yet*
 
+## Related work
+[installr](https://github.com/talgalili/installr)
+
+## Reference
+1. https://www.r-bloggers.com/how-to-do-a-silent-install-of-r/
+2. https://cran.r-project.org/bin/windows/base/rw-FAQ.html#Can-I-customize-the-installation_003f
+3. https://jrsoftware.org/ishelp/
+
 ## Extra
 While this repo is mainly to automate R installation outside of R, an R script ['install_packages.R'](https://raw.githubusercontent.com/jonekeat/r_installer/master/install_packages.R) also included for "safer" R package installation on Windows. For a better alternative, consider [pak](https://github.com/r-lib/pak).
 
