@@ -1,10 +1,8 @@
 # r_installer
 :no_mouth: Silently install different versions of R on Windows
 
-*Note: This repo is currently not working solution yet*
-
 ## Related work
-[installr](https://github.com/talgalili/installr)
+For updating R to latest version or install R-related softwares in R, use [installr](https://github.com/talgalili/installr)
 
 ## Reference
 1. https://www.r-bloggers.com/how-to-do-a-silent-install-of-r/
