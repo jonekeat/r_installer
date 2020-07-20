@@ -1,6 +1,7 @@
 :: The following code was borrow & modified from https://stackoverflow.com/questions/3973824/windows-bat-file-optional-argument-parsing
 @echo off
 for /f "tokens=3*" %%d IN ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Personal"') do (set documents_path=%%d %%e)
+for /l %%a in (1,1,31) do if "%documents_path:~-1%"==" " set documents_path=%documents_path:~0,-1%
 setlocal enableDelayedExpansion
 
 set "options=-r_version:"" -root_url:"https://cloud.r-project.org/bin/windows/base/old" -download_url:"" -download_path:"" -keep_installer:"true" -install_rtools:"true" -options:"/SILENT""
@@ -139,6 +140,7 @@ echo R-!r_version! successfully installed!
       bitsadmin /transfer download_rtools /download /priority NORMAL !rtools_url! "!download_path!\!rtools_file_name!"
       
       :: Install Rtools
+      echo Installing Rtools into "!documents_path!\Rtools!rtools_version!"
       "!download_path!\!rtools_file_name!" /SILENT /DIR="!documents_path!\Rtools!rtools_version!"
       if !keep_installer!=="false" (
         echo Cleaning up Rtools installer...
@@ -147,9 +149,9 @@ echo R-!r_version! successfully installed!
       :: Add Rtools dir to PATH
       for /f "tokens=3*" %%d IN ('reg query HKEY_CURRENT_USER\Environment /v Path') do (set path=%%d %%e)
       if !rtools_version!==40 (
-        C:\Windows\System32\setx.exe PATH "!path!!documents_path!\Rtools!rtools_version!\usr\bin"  
+        C:\Windows\System32\setx.exe PATH "!path!;!documents_path!\Rtools!rtools_version!\usr\bin"  
       ) else (
-        C:\Windows\System32\setx.exe PATH "!path!!documents_path!\Rtools!rtools_version!\bin"
+        C:\Windows\System32\setx.exe PATH "!path!;!documents_path!\Rtools!rtools_version!\bin"
       )
       echo Rtools!rtools_version! successfully installed!
     ) else (
