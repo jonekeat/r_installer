@@ -60,7 +60,7 @@ if not "!r_version!"=="" (
 )
 
 :: Check -download_path
-if not exist !download_path! (
+if not exist "!download_path!" (
   echo '!download_path!' not exist! Please specify a valid 'download_path'
   GOTO:EOF
 )
@@ -94,12 +94,26 @@ if !r_exist!=="true" (
 :: Download R installer for Windows using BITSadmin
 for %%F in (!download_url!) do set file_name=%%~nxF
 bitsadmin /transfer download_r /download /priority NORMAL !download_url! "!download_path!\!file_name!"
+if not !errorlevel!==0 (
+  echo Something wrong downloading R installer...
+  GOTO:EOF
+)
 
 :: Install R silently, give meaningful message if got issues, eg admin right,..
 "!download_path!\!file_name!" !options!
 if !keep_installer!=="false" (
   echo Cleaning up R installer...
   del "!download_path!\!file_name!" /s /f /q
+)
+
+:: Create personal library if not exist
+for /f "tokens=3*" %%d IN ('reg query "HKEY_CURRENT_USER\Software\R-core\R\!r_version!" /v "InstallPath"') do (set r_install_path=%%d %%e)
+for /l %%a in (1,1,31) do if "!r_install_path:~-1!"==" " set r_install_path=!r_install_path:~0,-1!
+for %%q in ("!r_install_path!") do set r_install_path=%%~dpq
+set r_minor_ver=!r_version:~0,3!
+if not exist "!r_install_path!win-library\!r_minor_ver!" (
+  mkdir "!r_install_path!win-library\!r_minor_ver!"
+  echo Created new personal library at '!r_install_path!win-library\!r_minor_ver!'
 )
 echo R-!r_version! successfully installed!
 
@@ -138,7 +152,11 @@ echo R-!r_version! successfully installed!
       )
       for %%F in (!rtools_url!) do set rtools_file_name=%%~nxF
       bitsadmin /transfer download_rtools /download /priority NORMAL !rtools_url! "!download_path!\!rtools_file_name!"
-      
+      if not !errorlevel!==0 (
+        echo Something wrong downloading Rtools installer...
+        GOTO:EOF
+      )
+
       :: Install Rtools
       echo Installing Rtools into "!documents_path!\Rtools!rtools_version!"
       "!download_path!\!rtools_file_name!" /SILENT /DIR="!documents_path!\Rtools!rtools_version!"
