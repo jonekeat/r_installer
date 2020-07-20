@@ -3,7 +3,7 @@
 for /f "tokens=3*" %%d IN ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Personal"') do (set documents_path=%%d %%e)
 setlocal enableDelayedExpansion
 
-set "options=-r_version:"" -root_url:"https://cloud.r-project.org/bin/windows/base/old" -download_url:"" -download_path:"" -keep_installer:"true" -install_rtools:"true" -options:"""
+set "options=-r_version:"" -root_url:"https://cloud.r-project.org/bin/windows/base/old" -download_url:"" -download_path:"" -keep_installer:"true" -install_rtools:"true" -options:"/SILENT""
 
 for %%O in (%options%) do for /f "tokens=1,* delims=:" %%A in ("%%O") do set "%%A=%%~B"
 :loop
@@ -49,9 +49,6 @@ if "!download_path!"=="" (
 set keep_installer=!-keep_installer!
 set install_rtools=!-install_rtools!
 set options=!-options!
-if "!options!"=="" (
-  set options="/SILENT /DIR="!documents_path!""
-)
 
 :: Check -r_version
 if not "!r_version!"=="" (
@@ -150,9 +147,9 @@ echo R-!r_version! successfully installed!
       :: Add Rtools dir to PATH
       for /f "tokens=3*" %%d IN ('reg query HKEY_CURRENT_USER\Environment /v Path') do (set path=%%d %%e)
       if !rtools_version!==40 (
-        setx PATH "!path!;!documents_path!\Rtools!rtools_version!\usr\bin"  
+        C:\Windows\System32\setx.exe PATH "!path!;!documents_path!\Rtools!rtools_version!\usr\bin"  
       ) else (
-        setx PATH "!path!;!documents_path!\Rtools!rtools_version!\bin"
+        C:\Windows\System32\setx.exe PATH "!path!;!documents_path!\Rtools!rtools_version!\bin"
       )
       echo Rtools!rtools_version! successfully installed!
     ) else (
