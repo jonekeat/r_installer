@@ -148,6 +148,8 @@ echo R-!r_version! successfully installed!
       )
       :: Add Rtools dir to PATH
       for /f "tokens=3*" %%d IN ('reg query HKEY_CURRENT_USER\Environment /v Path') do (set path=%%d %%e)
+      for /l %%a in (1,1,31) do if "!path:~-1!"==" " set path=!path:~0,-1!
+      for /l %%a in (1,1,31) do if "!path:~-1!"==";" set path=!path:~0,-1!
       if !rtools_version!==40 (
         C:\Windows\System32\setx.exe PATH "!path!;!documents_path!\Rtools!rtools_version!\usr\bin"  
       ) else (
